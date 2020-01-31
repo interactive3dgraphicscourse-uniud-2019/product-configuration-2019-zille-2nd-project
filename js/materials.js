@@ -254,7 +254,7 @@ const setupMaterials = (callback) => {
 
         // In questo caso non utilizzo MeshStandardMaterial perchè questo materiale
         // mi serve solo per visualizzare l'ombra dovuta all'occlusione ambientale
-        // sotto i bastoncini e al profumatore
+        // sotto i bastoni e al profumatore
         floor_material = new THREE.MeshBasicMaterial({
             aoMap: aoMap
         });

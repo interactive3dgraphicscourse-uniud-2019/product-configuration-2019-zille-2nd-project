@@ -22,12 +22,10 @@ class PropertyOption extends React.Component {
     }
 
     render() {
-        let content = this.props.option.description;
-        if (this.props.option.previewTexture) {
-            content = React.createElement('img', { src: `./img/${this.props.option.previewTexture}` });
-        }
-
-        return React.createElement('div', { className: 'property-option', onClick: () => this.applyOption() }, content);
+        return React.createElement('div', { className: 'property-option', onClick: () => this.applyOption() },
+            React.createElement('img', { src: `./img/${this.props.option.previewTexture}` }),
+            React.createElement('span', null, this.props.option.description)
+        );
     }
 }
 
@@ -54,7 +52,9 @@ class Property extends React.Component {
     }
 
     render() {
-        return React.createElement('div', { className: 'property', onClick: () => this.props.showPropertyOptions(this) }, this.props.name);
+        return React.createElement('div', { className: 'property', onClick: () => this.props.showPropertyOptions(this) },
+            React.createElement('img', { src: this.props.image }),
+            React.createElement('span', null, this.props.name));
     }
 }
 
@@ -77,9 +77,9 @@ class Configurator extends React.Component {
     getContent() {
         if (!this.state.currentProperty) {
             return [
-                React.createElement(Property, { key: 'tap', name: 'Tappo', parts: [current_model_parts.tap], options: tap_materials, showPropertyOptions: (prop) => this.showPropertyOptions(prop) }),
-                React.createElement(Property, { key: 'container', name: 'Contenitore', parts: [current_model_parts.container, current_model_parts.containerTopBottom], options: container_materials, showPropertyOptions: (prop) => this.showPropertyOptions(prop) }),
-                React.createElement(Property, { key: 'sticks', name: 'Bastoncini', parts: [current_model_parts.sticks], options: sticks_materials, showPropertyOptions: (prop) => this.showPropertyOptions(prop) })
+                React.createElement(Property, { key: 'tap', name: 'Tappo', image: './img/configure_tap.svg', parts: [current_model_parts.tap], options: tap_materials, showPropertyOptions: (prop) => this.showPropertyOptions(prop) }),
+                React.createElement(Property, { key: 'container', name: 'Contenitore', image: './img/configure_container.svg', parts: [current_model_parts.container, current_model_parts.containerTopBottom], options: container_materials, showPropertyOptions: (prop) => this.showPropertyOptions(prop) }),
+                React.createElement(Property, { key: 'sticks', name: 'Bastoni', image: './img/configure_sticks.svg', parts: [current_model_parts.sticks], options: sticks_materials, showPropertyOptions: (prop) => this.showPropertyOptions(prop) })
             ];
         }
         else {

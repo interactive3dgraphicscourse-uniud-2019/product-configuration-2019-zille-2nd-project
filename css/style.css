@@ -117,11 +117,11 @@ body {
 
 .property-options-container .property-options-list .property-option {
     width: 50%;
-    height: 128px;
     padding: 16px;
-    text-align: center;
     border-bottom: 1px solid #d5d5d5;
+    text-align: center;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
@@ -138,6 +138,16 @@ body {
     padding: 32px;
     text-align: center;
     border-top: 1px solid #d5d5d5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.configurator-main .property img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 8px;
 }
 
 .configurator-main .property:first-child {
@@ -147,6 +157,7 @@ body {
 .property-option img {
     width: 96px;
     height: 96px;
+    margin-bottom: 8px;
 }
 
 .property-options-container .back-button {
