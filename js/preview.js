@@ -3,7 +3,7 @@ import { GLTFLoader } from '../lib/GLTFLoader.js';
 import { OrbitControls } from '../lib/OrbitControls.js';
 import { RGBELoader } from '../lib/RGBELoader.js';
 import { RoughnessMipmapper } from '../lib/RoughnessMipmapper.js';
-import { setupMaterials } from './materials.js';
+import { setupMaterials, floor_material } from './materials.js';
 
 let scene = null;
 let camera = null;
@@ -13,7 +13,8 @@ let current_model_parts = {
     container: null,
     containerTopBottom: null,
     tap: null,
-    sticks: null
+    sticks: null,
+    floor: null
 };
 
 const init = (callback) => {
@@ -40,19 +41,8 @@ const init = (callback) => {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 6, 0);
     controls.enablePan = false;
-
-    const dirLight = new THREE.DirectionalLight();
-    dirLight.intensity = 1.0; // 1 lux
-    dirLight.position.set(-1, 1.75, 1);
-    dirLight.position.multiplyScalar(50);
-    dirLight.castShadow = true;
-    dirLight.shadow.camera.left = -64;
-    dirLight.shadow.camera.right = 64;
-    dirLight.shadow.camera.top = 64;
-    dirLight.shadow.camera.bottom = -64;
-    dirLight.shadow.mapSize.width = 2048;
-    dirLight.shadow.mapSize.height = 2048;
-    scene.add(dirLight);
+	controls.minPolarAngle = Math.PI * 0.05;
+	controls.maxPolarAngle = Math.PI / 1.8;
 
     setupMaterials(() => {
         new RGBELoader()
@@ -84,6 +74,9 @@ const init = (callback) => {
                             else if(child.material.name == "Bastoni") {
                                 current_model_parts.sticks = child;
                             }
+                            else if(child.material.name == "Pavimento") {
+                                current_model_parts.floor = child;
+                            }
                             
                             roughnessMipmapper.generateMipmaps(child.material);
                         }
@@ -91,6 +84,8 @@ const init = (callback) => {
 
                     scene.add(gltf.scene);
                     roughnessMipmapper.dispose();
+
+                    current_model_parts.floor.material = floor_material;
 
                     callback();
                 });

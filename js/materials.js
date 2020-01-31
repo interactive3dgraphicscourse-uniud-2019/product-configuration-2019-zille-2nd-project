@@ -4,6 +4,7 @@ let materials = {};
 let tap_materials = [];
 let container_materials = [];
 let sticks_materials = [];
+let floor_material = null;
 
 const textureLoader = new THREE.TextureLoader();
 
@@ -263,7 +264,16 @@ const setupMaterials = (callback) => {
         materials.wood_quartered_recchiuti_001,
         materials.wood_quartered_sunflower_seed_001);
 
-    callback();
+    textureLoader.load(`./textures/floor_ambient_occlusion.png`, (aoMap) => {
+        floor_material = new THREE.MeshStandardMaterial({
+            aoMap: aoMap,
+            color: new THREE.Color(1.0, 1.0, 1.0),
+            roughness: 1.0,
+            metalness: 0.0
+        });
+
+        callback();
+    });
 };
 
-export { setupMaterials, materials, tap_materials, container_materials, sticks_materials };
+export { setupMaterials, materials, tap_materials, container_materials, sticks_materials, floor_material };
