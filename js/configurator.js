@@ -1,4 +1,4 @@
-import { tap_materials, container_materials, sticks_materials, materials } from './materials.js';
+import { tap_materials, container_materials, sticks_materials } from './materials.js';
 import { setupPreview, current_model_parts } from './preview.js';
 
 class PropertyOption extends React.Component {
@@ -24,7 +24,7 @@ class PropertyOption extends React.Component {
     render() {
         let content = this.props.option.description;
         if (this.props.option.previewTexture) {
-            content = React.createElement('img', { src: `./textures/materials/${this.props.option.previewTexture}` });
+            content = React.createElement('img', { src: `./img/${this.props.option.previewTexture}` });
         }
 
         return React.createElement('div', { className: 'property-option', onClick: () => this.applyOption() }, content);

@@ -3,7 +3,7 @@ import { GLTFLoader } from '../lib/GLTFLoader.js';
 import { OrbitControls } from '../lib/OrbitControls.js';
 import { RGBELoader } from '../lib/RGBELoader.js';
 import { RoughnessMipmapper } from '../lib/RoughnessMipmapper.js';
-import { setupMaterials, floor_material } from './materials.js';
+import { setupMaterials, materials, floor_material } from './materials.js';
 
 let scene = null;
 let camera = null;
@@ -22,7 +22,7 @@ const init = (callback) => {
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
-    renderer.setClearColor(0xf0f0f0);
+    renderer.setClearColor(0xe8e8e8);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.outputEncoding = THREE.sRGBEncoding;
@@ -36,11 +36,13 @@ const init = (callback) => {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
-    camera.position.set(0, 9, 15);
+    camera.position.set(0, 15, 18);
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 6, 0);
     controls.enablePan = false;
+    controls.minDistance = 12.0;
+    controls.maxDistance = 30.0;
 	controls.minPolarAngle = Math.PI * 0.05;
 	controls.maxPolarAngle = Math.PI / 1.8;
 
@@ -48,16 +50,14 @@ const init = (callback) => {
         new RGBELoader()
             .setDataType(THREE.UnsignedByteType)
             .setPath('textures/')
-            .load('cloud_layers_1k.hdr', function (texture) {
+            .load('reading_room_1k.hdr', function (texture) {
 
-                var envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
                 pmremGenerator.dispose();
-
-                var roughnessMipmapper = new RoughnessMipmapper(renderer);
 
                 scene.environment = envMap;
 
-                var loader = new GLTFLoader().setPath('models/');
+                const loader = new GLTFLoader().setPath('models/');
                 loader.load('profumatore_piccolo_no_mod.glb', function (gltf) {
 
                     gltf.scene.traverse(function (child) {
@@ -77,22 +77,72 @@ const init = (callback) => {
                             else if(child.material.name == "Pavimento") {
                                 current_model_parts.floor = child;
                             }
-                            
-                            roughnessMipmapper.generateMipmaps(child.material);
                         }
                     });
 
-                    scene.add(gltf.scene);
-                    roughnessMipmapper.dispose();
+                    const setupContainer = (callback) => {
+                        if(materials.white_rubber.material) {
+                            current_model_parts.container.material = materials.white_rubber.material;
+                            current_model_parts.containerTopBottom.material = materials.white_rubber.material;
+
+                            callback();
+                        }
+                        else {
+                            materials.white_rubber.load((material) => {
+                                materials.white_rubber.material = material;
+                                current_model_parts.container.material = material;
+                                current_model_parts.containerTopBottom.material = material;
+
+                                callback();
+                            });
+                        }
+                    };
+
+                    const setupTap = (callback) => {
+                        if(materials.smooth_black_metal.material) {
+                            current_model_parts.tap.material = materials.smooth_black_metal.material;
+
+                            callback();
+                        }
+                        else {
+                            materials.smooth_black_metal.load((material) => {
+                                materials.smooth_black_metal.material = material;
+                                current_model_parts.tap.material = material;
+
+                                callback();
+                            });
+                        }
+                    };
+
+                    const setupSticks = (callback) => {
+                        if(materials.wood_fine_008.material) {
+                            current_model_parts.sticks.material = materials.wood_fine_008.material;
+                            callback();
+                        }
+                        else {
+                            materials.wood_fine_008.load((material) => {
+                                materials.wood_fine_008.material = material;
+                                current_model_parts.sticks.material = material;
+                                callback();
+                            });
+                        }
+                    };
 
                     current_model_parts.floor.material = floor_material;
-
-                    callback();
+                    setupContainer(() => {
+                        setupTap(() => {
+                            setupSticks(() => {
+                                scene.add(gltf.scene);
+                                callback();
+                            });
+                        });
+                    });
                 });
             });
     });
 
     window.addEventListener('resize', onWindowResize, false);
+    document.getElementById("rotation-button").onclick = toggleCameraAutoRotation;
 }
 
 const onWindowResize = () => {
@@ -119,6 +169,10 @@ const render = () => {
 const setupPreview = (callback) => {
     init(callback);
     update();
+}
+
+const toggleCameraAutoRotation = () => {
+    controls.autoRotate = !controls.autoRotate;
 }
 
 export { setupPreview, current_model_parts };
